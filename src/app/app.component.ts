@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -8,12 +9,11 @@ import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/co
 export class AppComponent implements OnInit {
   data: any = null;
   activePage: any = null;
-  activeId: string = 'F2Igxe9';
+  activeId: string = '';
+  activeType: string = '';
   titles: string[] = [];
-  
-  // @ViewChild('blockquoteContainer', { read: ElementRef }) blockquoteContainer!: ElementRef;
 
-  constructor(private renderer: Renderer2) { }
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     const storage = this.getStorage('storage');
@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
     this.titles = storage.titles;
     this.activeId = storage.activeId;
     this.activePage = storage.activePage;
+    this.activeType = storage.activeType;
   }
 
   onFileSelected(event: Event) {
@@ -60,15 +61,35 @@ export class AppComponent implements OnInit {
       const parts = line.split(' - ');
       if (parts.length === 2) {
         const [key, url] = parts;
-        const match = url.match(/\/([^/.]+)\.gifv$/);
-        console.log(match);
-        if (match) {
-          const id = match[1];
+
+        const isGyfcat = url.includes('gfycat.com');
+        const isImgur = url.includes('imgur.com');
+        const isImgurGif = url.includes('i.imgur.com');
+
+        let id: string = '';
+        let type: string = '';
+        
+        if (isGyfcat) {
+          id = this.getGyfcatId(url);
+          type = 'gyfcat';
+        }
+
+        if (isImgur && !isImgurGif) {
+          id = this.getImgurId(url);
+          type = 'imgur';
+        }
+
+        if (isImgur && isImgurGif) {
+          id = this.getImgurGifId(url);
+          type = 'imgur';
+        }
+
+        if (id && type) {
           if (!this.data[key]) {
-            this.data[key] = { title: key,  items: [] };
+            this.data[key] = { title: key,  imgur: [], gyfcat: [] };
           }
-          const item = {id, url};
-          this.data[key].items.push(item);
+          const item = {id, url, type};
+          this.data[key][type].push(item);
         }
       }
     });
@@ -79,15 +100,48 @@ export class AppComponent implements OnInit {
     console.log('data', this.data);
   }
 
+  getGyfcatLink(id: string): any {
+    const url = 'https://web.archive.org/web/20230819113342if_/https://gfycat.com/' + id;
+    const safeUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    return safeUrl;
+  }
+
+  getGyfcatId(url: string): string {
+    const match = url.match(/gfycat\.com\/([^/]+)/);
+    if (match) {
+      return match[1];
+    }
+    return '';
+  }
+
+  getImgurId(url: string): string {
+    const match = url.match(/imgur\.com\/([^/.]+)/);
+    if (match) {
+      return match[1];
+    }
+    return '';
+  }
+  
+  getImgurGifId(url: string): string {
+    const match = url.match(/i.imgur\.com\/([^/.]+)\.gifv/);
+    if (match) {
+      return match[1];
+    }
+    return '';
+  }
+
   setPage(page: any): void {
     this.activePage = page;
     this.saveStorage();
   }
 
-  setItem(id: string): void {
+  setItem(id: string, type: string): void {
     this.activeId = id;
+    this.activeType = type;
     this.saveStorage();
-    location.reload();
+    if (type === 'imgur') {
+      location.reload();
+    }
   }
 
   saveStorage(): void {
@@ -98,6 +152,7 @@ export class AppComponent implements OnInit {
       titles: this.titles,
       activePage: this.activePage,
       activeId: this.activeId,
+      activeType: this.activeType,
     };
 
     this.setStorage('storage', storage);
@@ -126,7 +181,8 @@ export class AppComponent implements OnInit {
     this.data = null;
     this.titles = [];
     this.activePage = {};
-    this.activeId = 'F2Igxe9';
+    this.activeId = '';
+    this.activeType = '';
   }
 
   // createBlockquote(activeId: string) {

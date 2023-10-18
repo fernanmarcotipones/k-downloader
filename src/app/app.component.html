@@ -16,28 +16,34 @@
         <input type="file" #fileInput (change)="onFileSelected($event)" accept=".txt">
       </ng-container>
     </div>
-    <div *ngIf="activePage">
+    <div class="row" *ngIf="activePage">
       <div class="col-6">
-        <ng-container *ngFor="let item of activePage.items">
+        <ng-container *ngFor="let item of activePage.gyfcat; let i = index">
           <button 
             class="btn btn-dark"
             [ngClass]="{'active': item.id === activeId}"
-            (click)="setItem(item.id)">
-            {{ item.id }}
+            (click)="setItem(item.id, item.type)">
+            {{ item.type + ' ' + i }}
           </button>
-          <!-- <a 
-            class="btn btn-secondary"
+        </ng-container>
+      </div>
+      <div class="col-6">
+        <ng-container *ngFor="let item of activePage.imgur; let i = index">
+          <button 
+            class="btn btn-light"
             [ngClass]="{'active': item.id === activeId}"
-            [href]="item.url">
-            {{ item.id }}
-          </a> -->
+            (click)="setItem(item.id, item.type)">
+            {{ item.type + ' ' + i }}
+          </button>
         </ng-container>
       </div>
     </div>
   </div>
-  <div #blockquoteContainer class="col-6 d-flex align-items-center justify-content-center">
-    <blockquote class="imgur-embed-pub" lang="en" [attr.data-id]="activeId" data-context="false">
+  <div *ngIf="activeId" #blockquoteContainer class="col-6 d-flex justify-content-center">
+    <blockquote *ngIf="activeType === 'imgur'" class="imgur-embed-pub" lang="en" [attr.data-id]="activeId" data-context="false">
       <a href="//imgur.com/{{activeId}}"></a>
     </blockquote>
+    <iframe *ngIf="activeType === 'gyfcat'" [src]="getGyfcatLink(activeId)"
+      frameborder='0' scrolling='yes' allowfullscreen></iframe>
   </div>
 </div>
