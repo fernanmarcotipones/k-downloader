@@ -2,7 +2,7 @@
   <div class="col-6">
     <div class="mb-3">
       <ng-container *ngIf="data">
-        <button class="btn btn-secondary" (click)="clearData()">Clear</button>
+        <button class="btn btn-danger" (click)="clearData()">Clear</button>
         <ng-container *ngFor="let title of titles">
           <button 
             class="btn btn-primary"
@@ -20,7 +20,7 @@
       <div class="col-6">
         <ng-container *ngFor="let item of activePage.gyfcat; let i = index">
           <button 
-            class="btn btn-dark"
+            class="btn btn-secondary"
             [ngClass]="{'active': item.id === activeId}"
             (click)="setItem(item.id, item.type)">
             {{ item.type + ' ' + i }}
