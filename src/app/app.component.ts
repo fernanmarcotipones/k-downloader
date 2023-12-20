@@ -65,10 +65,16 @@ export class AppComponent implements OnInit {
         const isGyfcat = url.includes('gfycat.com');
         const isImgur = url.includes('imgur.com');
         const isImgurGif = url.includes('i.imgur.com');
+        const isPixel = url.includes('pixeldrain.com');
 
         let id: string = '';
         let type: string = '';
         
+        if (isPixel) {
+          id = this.getPixelId(url);
+          type = 'pixel';
+        }
+
         if (isGyfcat) {
           id = this.getGyfcatId(url);
           type = 'gyfcat';
@@ -86,7 +92,7 @@ export class AppComponent implements OnInit {
 
         if (id && type) {
           if (!this.data[key]) {
-            this.data[key] = { title: key,  imgur: [], gyfcat: [] };
+            this.data[key] = { title: key,  imgur: [], gyfcat: [], pixel: [] };
           }
           const item = {id, url, type};
           this.data[key][type].push(item);
@@ -100,8 +106,14 @@ export class AppComponent implements OnInit {
     console.log('data', this.data);
   }
 
-  getGyfcatLink(id: string): any {
-    const url = 'https://web.archive.org/web/20230819113342if_/https://gfycat.com/' + id;
+  getPixelId(url: string): string {
+    const regex = /\/([^/]+)$/;
+    const match = regex.exec(url);
+    return match ? match[1] : '';
+  }
+
+  getPixelLink(id: string): any {
+    const url = 'https://pixeldrain.com/api/file/' + id;
     const safeUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     return safeUrl;
   }
@@ -112,6 +124,12 @@ export class AppComponent implements OnInit {
       return match[1];
     }
     return '';
+  }
+
+  getGyfcatLink(id: string): any {
+    const url = 'https://web.archive.org/web/20230819113342if_/https://gfycat.com/' + id;
+    const safeUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    return safeUrl;
   }
 
   getImgurId(url: string): string {
