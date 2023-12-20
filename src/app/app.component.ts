@@ -66,6 +66,7 @@ export class AppComponent implements OnInit {
         const isImgur = url.includes('imgur.com');
         const isImgurGif = url.includes('i.imgur.com');
         const isPixel = url.includes('pixeldrain.com');
+        const isRedgif = url.includes('redgifs.com');
 
         let id: string = '';
         let type: string = '';
@@ -73,6 +74,11 @@ export class AppComponent implements OnInit {
         if (isPixel) {
           id = this.getPixelId(url);
           type = 'pixel';
+        }
+
+        if (isRedgif) {
+          id = this.getRedgifId(url);
+          type = 'redgif';
         }
 
         if (isGyfcat) {
@@ -92,7 +98,7 @@ export class AppComponent implements OnInit {
 
         if (id && type) {
           if (!this.data[key]) {
-            this.data[key] = { title: key,  imgur: [], gyfcat: [], pixel: [] };
+            this.data[key] = { title: key,  imgur: [], gyfcat: [], pixel: [], redgif: [] };
           }
           const item = {id, url, type};
           this.data[key][type].push(item);
@@ -102,8 +108,18 @@ export class AppComponent implements OnInit {
 
     this.titles = Object.keys(this.data);
     this.saveStorage();
+  }
 
-    console.log('data', this.data);
+  getRedgifId(url: string): string {
+    const regex = /\/([^/]+)$/;
+    const match = regex.exec(url);
+    return match ? match[1] : '';
+  }
+
+  getRedgifLink(id: string): any {
+    const url = 'https://www.redgifs.com/watch/' + id;
+    const safeUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    return safeUrl;
   }
 
   getPixelId(url: string): string {

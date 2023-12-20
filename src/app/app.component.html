@@ -36,6 +36,16 @@
         </button>
       </ng-container>
     </div>
+    <div *ngIf="activePage.redgif?.length" class="col-12 menu-slider">
+      <ng-container *ngFor="let item of activePage.redgif; let i = index">
+        <button 
+          class="btn btn-danger"
+          [ngClass]="{'active': item.id === activeId}"
+          (click)="setItem(item.id, item.type)">
+          {{ 'RGF' + i }}
+        </button>
+      </ng-container>
+    </div>
     <div *ngIf="activePage.pixel?.length" class="col-12 menu-slider">
       <ng-container *ngFor="let item of activePage.pixel; let i = index">
         <button 
@@ -52,6 +62,8 @@
       <a href="//imgur.com/{{activeId}}"></a>
     </blockquote>
     <iframe *ngIf="activeType === 'gyfcat'" [src]="getGyfcatLink(activeId)"
+      frameborder='0' scrolling='yes' allowfullscreen></iframe>
+    <iframe *ngIf="activeType === 'redgif'" [src]="getRedgifLink(activeId)"
       frameborder='0' scrolling='yes' allowfullscreen></iframe>
     <iframe *ngIf="activeType === 'pixel'" [src]="getPixelLink(activeId)"
       frameborder='0' scrolling='yes' allowfullscreen></iframe>
