@@ -2,3 +2,13 @@ iframe {
   width: 100% !important;
   height: 1080px !important;
 }
+
+.menu-slider {
+  display: flex; 
+  overflow-x: auto;
+  padding: 0;
+
+  button {
+    border-radius: 0;
+  }
+}

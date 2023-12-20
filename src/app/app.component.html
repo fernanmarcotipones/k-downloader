@@ -1,45 +1,43 @@
-<div class="row">
-  <div class="col-6">
-    <div class="mb-3">
-      <ng-container *ngIf="data">
-        <button class="btn btn-danger" (click)="clearData()">Clear</button>
-        <ng-container *ngFor="let title of titles">
-          <button 
-            class="btn btn-primary"
-            [ngClass]="{'active': activePage && title === activePage.title}"
-            (click)="setPage(data[title])">
-            {{ title }}
-          </button>
-        </ng-container>
+<div class="row m-0">
+  <div class="col-12 menu-slider">
+    <ng-container *ngIf="data">
+      <button class="btn btn-danger" (click)="clearData()">Clear</button>
+      <ng-container *ngFor="let title of titles">
+        <button 
+          class="btn btn-primary"
+          [ngClass]="{'active': activePage && title === activePage.title}"
+          (click)="setPage(data[title])">
+          {{ title }}
+        </button>
       </ng-container>
-      <ng-container *ngIf="!data">
-        <input type="file" #fileInput (change)="onFileSelected($event)" accept=".txt">
-      </ng-container>
-    </div>
-    <div class="row" *ngIf="activePage">
-      <div class="col-6">
-        <ng-container *ngFor="let item of activePage.gyfcat; let i = index">
-          <button 
-            class="btn btn-secondary"
-            [ngClass]="{'active': item.id === activeId}"
-            (click)="setItem(item.id, item.type)">
-            {{ item.type + ' ' + i }}
-          </button>
-        </ng-container>
-      </div>
-      <div class="col-6">
-        <ng-container *ngFor="let item of activePage.imgur; let i = index">
-          <button 
-            class="btn btn-light"
-            [ngClass]="{'active': item.id === activeId}"
-            (click)="setItem(item.id, item.type)">
-            {{ item.type + ' ' + i }}
-          </button>
-        </ng-container>
-      </div>
-    </div>
+    </ng-container>
+    <ng-container *ngIf="!data">
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept=".txt">
+    </ng-container>
   </div>
-  <div *ngIf="activeId" #blockquoteContainer class="col-6 d-flex justify-content-center">
+  <ng-container *ngIf="activePage">
+    <div *ngIf="activePage.gyfcat?.length" class="col-12 menu-slider">
+      <ng-container *ngFor="let item of activePage.gyfcat; let i = index">
+        <button 
+          class="btn btn-secondary"
+          [ngClass]="{'active': item.id === activeId}"
+          (click)="setItem(item.id, item.type)">
+          {{ 'GYF' + i }}
+        </button>
+      </ng-container>
+    </div>
+    <div *ngIf="activePage.imgur?.length" class="col-12 menu-slider">
+      <ng-container *ngFor="let item of activePage.imgur; let i = index">
+        <button 
+          class="btn btn-light"
+          [ngClass]="{'active': item.id === activeId}"
+          (click)="setItem(item.id, item.type)">
+          {{ 'IMG' + i }}
+        </button>
+      </ng-container>
+    </div>
+  </ng-container>
+  <div *ngIf="activeId" #blockquoteContainer class="col-12 d-flex justify-content-center">
     <blockquote *ngIf="activeType === 'imgur'" class="imgur-embed-pub" lang="en" [attr.data-id]="activeId" data-context="false">
       <a href="//imgur.com/{{activeId}}"></a>
     </blockquote>
